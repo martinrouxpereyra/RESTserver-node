@@ -26,15 +26,14 @@ class Server{
 
     middlewares(){
 
-        this.cors.use(cors());
+        this.app.use(cors());
         //Directorio publico
         this.app.use(express.static('public'));
     }
 
     routes(){
-        this.app.get('/api', (req, res) => {
-            res.send('Hello World');
-        });
+
+        this.app.use('/api/users', require('../routes/user'));//configurando el endpoint al router
     }
 
     listen(){
