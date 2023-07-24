@@ -10,6 +10,7 @@ la palabra clave para saber que es un middleware es 'use'
 */
 const express = require('express');
 const cors = require('cors');
+const { dbConnection } = require('../database/config');
 
 class Server{
 
@@ -17,11 +18,18 @@ class Server{
         this.app = express();
         this.port = process.env.PORT || 8008;
 
+        //conexion a la bd
+        this.conectDB();
+
         //middlewares
         this.middlewares();
 
         //rutas de la app
         this.routes();
+    }
+
+    async conectDB(){
+        await dbConnection();
     }
 
     middlewares(){
