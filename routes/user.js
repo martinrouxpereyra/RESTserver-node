@@ -20,6 +20,6 @@ router.get('/', getUsers );
 
 router.post('/', postUser);
 
-router.delete('/', deleteUser);
+router.delete('/:uId', deleteUser); //:uId es un parametro de la url
 
 module.exports = router;
