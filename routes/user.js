@@ -11,26 +11,15 @@
 
 //NOTA: pongo solo '/' dentro de las peticiones pq en server mediante un middleware le digo el endpoint
 const {Router} = require('express');
+const {getUsers, postUser, deleteUser} = require('../controllers/user');
 
 const router = Router();
 
 
-router.get('/', (req, res) => {
-    res.json({
-        msg: 'get API'
-    });
-});
+router.get('/', getUsers );
 
-router.post('/', (req, res) => {
-    res.status(201).json({
-        msg: 'post API'
-    });
-});
+router.post('/', postUser);
 
-router.delete('/', (req, res) => {
-    res.json({
-        msg: 'delete API'
-    });
-});
+router.delete('/', deleteUser);
 
 module.exports = router;
