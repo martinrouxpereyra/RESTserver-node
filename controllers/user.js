@@ -1,4 +1,6 @@
 const {response, request} = require('express');
+const bcyptjs = require('bcryptjs');
+const User = require('../models/user');
 
 const getUsers = (req = request, res = response) => {
 
@@ -14,14 +16,23 @@ const getUsers = (req = request, res = response) => {
     });
 }
 
-const postUser =  (req, res = response) => {
+const postUser =  async(req, res = response) => {
     //const body = req.body;
-    const {nombre, edad} = req.body;
+    const {name, email, password, role} = req.body;
+    const user = new User({name, email, password, role});
+
+    //verificar si el correo existe
+
+    //encriptar la contraseña
+    const salt = bcyptjs.genSaltSync();//cantidad de vueltas para el hashing de la contraseña (por defecto esta en 10)
+    user.password = bcyptjs.hashSync(password, salt);//hace un hash de la contraseña de una sola via
+    //guardar en la bd
+    await user.save();
 
     res.json({
         msg: 'post API - controller',
-        //1body
-        nombre, edad
+        //body
+        user
     });
 }
 
