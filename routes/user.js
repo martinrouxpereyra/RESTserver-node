@@ -14,13 +14,13 @@ const {Router} = require('express');
 const {getUsers, postUser, deleteUser} = require('../controllers/user');
 const { check } = require('express-validator');
 const { valFields } = require('../middlewares/validate-fields');
-
+const { validRole } = require('../helpers/db-validations');
 const router = Router();
 
 /*
 Los middlewares son el segundo argumento, si no hay middlewares la llamada al controlador es el segundo.
 
-Al momento de ejecutar el post, antes de llamar al controlador va a hacer las varificaciones pertinentes,
+Al momento de ejecutar el post, antes de llamar al controlador va a hacer las verificaciones pertinentes,
 va a preparar un json con los errores que vaya encontrando, y cuamdo termine va a disparar el controlador
 donde vamos a fijarnos si ese arreglo de errores esta vacio o no y mostrar los errores
 */
@@ -30,7 +30,8 @@ router.post('/',[
   check('name', 'name is a required field').not().isEmpty(),
   check('email', 'invalid email').isEmail(),//si no es un email válido agrega el error a la lista de errores
   check('password', 'the password must have at least 6 characters').isLength({min: 6}),
-  check('role', 'invalid role').isIn(['ADMIN', 'USER']),
+  //check('role', 'invalid role').isIn(['ADMIN', 'USER']),
+  check('role').custom( validRole ), // (role) =>validRole(role) ... cuando el primer arg es el mismo arg que se recibe al principio, se manda solo la ref a la funcion
   valFields //middleware que checkea si cayó en alguno de los check
 ], postUser);//se manda un arreglo porque puede haber más de una validación para la misma request
 
