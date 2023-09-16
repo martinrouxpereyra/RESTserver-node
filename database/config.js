@@ -5,7 +5,6 @@ const dbConnection = async() =>{
     try {
         
         await mongoose.connect(process.env.MONGO_CNN);
-
         console.log('bd online');
 
     } catch (error) {

@@ -3,17 +3,29 @@ const bcyptjs = require('bcryptjs');
 const User = require('../models/user');
 
 
-const getUsers = (req = request, res = response) => {
+const getUser = async(req = request, res = response) => {
 
-    //const params = req.query;
-    const {id , q = 'no existe parametro "q"', uKey} = req.query; //QUERY params
+    const {limit = 5, skip = 0} = req.query;
+    const statusQuery = {status: true};
+
+    // const users = await User.find(statusQuery)
+    //     .skip(Number(skip))
+    //     .limit(Number(limit));
+    
+    // const totalUsers = await User.countDocuments(statusQuery);
+
+    //Promise.all ejecuta las promesas en simultaneo, si una falla, no sigue
+    const resp = await Promise.all([
+        User.countDocuments(statusQuery),
+        User.find(statusQuery)
+            .skip(Number(skip))
+            .limit(Number(limit))
+    ]);
 
     res.json({
-        msg: 'get API - controller',
-        //params
-        id: id,
-        q: q,
-        kwy: uKey
+        // totalUsers,
+        // users
+        resp
     });
 }
 
@@ -21,17 +33,6 @@ const postUser =  async(req, res = response) => {
 
     const {name, email, password, role} = req.body;
     const user = new User({name, email, password, role});
-
-    //verificar si el correo existe
-    const existsEmail = await User.findOne({email});//email: email es redundante
-    if(existsEmail){
-        
-        res.status(400).json({// 400 = bad request
-            msg: 'este correo ya existe'
-        });
-
-        return;
-    }
 
     //encriptar la contraseña
     const salt = bcyptjs.genSaltSync();//cantidad de vueltas para el hashing de la contraseña (por defecto esta en 10)
@@ -45,20 +46,43 @@ const postUser =  async(req, res = response) => {
     });
 }
 
-const deleteUser = (req, res = response) => {
+const putUser = async(req, res = response) =>{
+    const { id } = req.params;
+    const{ _id, password, google, mail, ...rest} = req.body;
 
-    const {uId} = req.params;
-    const status = res.statusCode;
-    console.log(status);
+    //TODO validar contra bd
+    if(password){
+        const salt = bcyptjs.genSaltSync();
+        rest.password = bcyptjs.hashSync(password, salt);
+    }
+
+    const user = await User.findByIdAndUpdate(id, rest);
+
     res.json({
-        msg: 'delete API - controller',
-        uId,
-        status
+        msg: 'put API - putUser',
+        user
+    });
+
+}
+const deleteUser = async(req, res = response) => {
+
+    const {id} = req.params;
+
+    //para borrar fisicamente de la bd
+    //const user = await User.findByIdAndDelete( id );
+
+    //"borrar", cambiando el status
+
+    const user = await User.findByIdAndUpdate(id , {status: false});
+
+    res.json({  
+        user
     });
 }
 
 module.exports = {
-    getUsers,
+    getUser,
     postUser,
-    deleteUser
+    deleteUser,
+    putUser
 }

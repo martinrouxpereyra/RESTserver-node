@@ -11,10 +11,10 @@
 
 //NOTA: pongo solo '/' dentro de las peticiones pq en server mediante un middleware le digo el endpoint
 const {Router} = require('express');
-const {getUsers, postUser, deleteUser} = require('../controllers/user');
+const {getUser, postUser, deleteUser, putUser} = require('../controllers/user');
 const { check } = require('express-validator');
 const { valFields } = require('../middlewares/validate-fields');
-const { validRole } = require('../helpers/db-validations');
+const { validRole, existingEmail, existingUser } = require('../helpers/db-validations');
 const router = Router();
 
 /*
@@ -24,17 +24,29 @@ Al momento de ejecutar el post, antes de llamar al controlador va a hacer las ve
 va a preparar un json con los errores que vaya encontrando, y cuamdo termine va a disparar el controlador
 donde vamos a fijarnos si ese arreglo de errores esta vacio o no y mostrar los errores
 */
-router.get('/', getUsers );
+router.get('/', getUser );
+
+router.put('/:id',[
+  check('id', 'is not a valid id').isMongoId(),
+  check('id').custom(existingUser),
+  check('role').custom( validRole ),
+  valFields
+], putUser );
 
 router.post('/',[
   check('name', 'name is a required field').not().isEmpty(),
-  check('email', 'invalid email').isEmail(),//si no es un email válido agrega el error a la lista de errores
   check('password', 'the password must have at least 6 characters').isLength({min: 6}),
+  //check('email', 'invalid email').isEmail(),//si no es un email válido agrega el error a la lista de errores
+  check('email').custom(existingEmail).isEmail(),
   //check('role', 'invalid role').isIn(['ADMIN', 'USER']),
   check('role').custom( validRole ), // (role) =>validRole(role) ... cuando el primer arg es el mismo arg que se recibe al principio, se manda solo la ref a la funcion
   valFields //middleware que checkea si cayó en alguno de los check
 ], postUser);//se manda un arreglo porque puede haber más de una validación para la misma request
 
-router.delete('/:uId', deleteUser); //:uId es un parametro de la url
+router.delete('/:id',[
+  check('id', 'is not a valid id').isMongoId(),
+  check('id').custom(existingUser),
+  valFields
+], deleteUser); //:id es un parametro de la url
 
 module.exports = router;
