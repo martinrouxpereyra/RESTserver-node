@@ -68,15 +68,18 @@ const deleteUser = async(req, res = response) => {
 
     const {id} = req.params;
 
+    //viene del middleware validate-jwt ya que lo mande en el header
+    const authorizedUser = req.authorizedUser;
+
     //para borrar fisicamente de la bd
     //const user = await User.findByIdAndDelete( id );
 
     //"borrar", cambiando el status
-
     const user = await User.findByIdAndUpdate(id , {status: false});
 
     res.json({  
-        user
+        user,
+        authorizedUser
     });
 }
 

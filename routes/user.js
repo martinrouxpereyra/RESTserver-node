@@ -14,6 +14,7 @@ const {Router} = require('express');
 const {getUser, postUser, deleteUser, putUser} = require('../controllers/user');
 const { check } = require('express-validator');
 const { valFields } = require('../middlewares/validate-fields');
+const { validateJWT } = require('../middlewares/validate-jwt');
 const { validRole, existingEmail, existingUser } = require('../helpers/db-validations');
 const router = Router();
 
@@ -44,6 +45,7 @@ router.post('/',[
 ], postUser);//se manda un arreglo porque puede haber más de una validación para la misma request
 
 router.delete('/:id',[
+  validateJWT,
   check('id', 'is not a valid id').isMongoId(),
   check('id').custom(existingUser),
   valFields
