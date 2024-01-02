@@ -1,11 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso denegado</title>
-</head>
-<body>
-    <h1>Acceso Denegado</h1>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Google Sign-in</title>
+	</head>
+	<body>
+		<h1>Google Sign-in</h1>
+		<hr />
+
+		<div
+			id="g_id_onload"
+			data-client_id="187390478273-0atush0r3rgnbhmf5oih2h08pvia3vmf.apps.googleusercontent.com"
+			data-auto_prompt="false"
+			data-callback="handleCredentialResponse"
+		></div>
+		<div
+			class="g_id_signin"
+			data-type="standard"
+			data-size="large"
+			data-theme="outline"
+			data-text="sign_in_with"
+			data-shape="rectangular"
+			data-logo_alignment="left"
+		></div>
+
+		<script src="https://accounts.google.com/gsi/client" async></script>
+
+		<script>
+			function handleCredentialResponse(response) {
+				//google token : ID_TOKEN
+				console.log('ID_TOKEN : ', response.credential);
+				const body = { id_token: response.credential };
+				fetchData(body);
+			}
+
+			async function fetchData(body) {
+				try {
+					const response = await fetch(
+						'http://localhost:8080/api/auth/google',
+						{
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify(body),
+						}
+					);
+					console.log(response);
+					if (!response.ok) {
+						throw new Error('Network response was not ok');
+					}
+
+					const data = await response.json();
+					console.log(data);
+				} catch (error) {
+					console.warn(error);
+				}
+			}
+		</script>
+	</body>
 </html>
