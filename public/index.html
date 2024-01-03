@@ -25,12 +25,13 @@
 			data-logo_alignment="left"
 		></div>
 
+		<button id="google_signOut">SignOut</button>
+
 		<script src="https://accounts.google.com/gsi/client" async></script>
 
 		<script>
 			function handleCredentialResponse(response) {
 				//google token : ID_TOKEN
-				console.log('ID_TOKEN : ', response.credential);
 				const body = { id_token: response.credential };
 				fetchData(body);
 			}
@@ -54,10 +55,25 @@
 
 					const data = await response.json();
 					console.log(data);
+					//saving email in localStorage
+					localStorage.setItem('email', data.user.email);
 				} catch (error) {
 					console.warn(error);
 				}
 			}
+
+			const button = document.getElementById('google_signOut');
+			button.onclick = () => {
+				console.log(google.accounts.id);
+				google.accounts.id.disableAutoSelect();
+
+				google.accounts.id.revoke(
+					localStorage.getItem('email'), done => {
+						localStorage.clear();
+						location.reload();
+					}
+				);
+			};
 		</script>
 	</body>
 </html>
