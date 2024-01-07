@@ -18,6 +18,11 @@ class Server{
         this.app = express();
         this.port = process.env.PORT || 8008;
 
+        this.paths = {
+            auth:       '/api/auth',
+            categories: '/api/categories',
+            users:      '/api/users'
+        }
         //conexion a la bd
         this.conectDB();
 
@@ -46,8 +51,9 @@ class Server{
 
     routes(){
 
-        this.app.use('/api/auth', require('../routes/auth'));
-        this.app.use('/api/users', require('../routes/user'));//configurando el endpoint al router
+        this.app.use(this.paths.auth, require('../routes/auth'));
+        this.app.use(this.paths.categories, require('../routes/categories'));
+        this.app.use(this.paths.users, require('../routes/user'));//configurando el endpoint al router
     }
 
     listen(){
