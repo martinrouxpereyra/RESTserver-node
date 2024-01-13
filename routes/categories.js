@@ -5,6 +5,7 @@ const { getCategories, postCategory, getCategoty, putCategory, deleteCategoty } 
 const { valFields } = require('../middlewares/validate-fields');
 const { validateJWT} = require('../middlewares/validate-jwt');  
 const { existingCategory, deletedCategory } = require('../helpers/db-validations');
+const { isAdminRole } = require('../middlewares/validate-isAdminRole');
 
 const router = Router();
 
@@ -37,6 +38,7 @@ router.put('/:id',[
 //"Eliminar una categoria"
 router.delete('/:id',[
     validateJWT,
+    isAdminRole,
     check('id', 'is not a valid id').isMongoId(),
     check('id').custom(existingCategory),
     check('id').custom(deletedCategory),

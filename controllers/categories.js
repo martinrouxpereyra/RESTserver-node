@@ -1,7 +1,6 @@
 const { response } = require('express');
 
 const { Category } = require('../models/index');
-const { auth } = require('google-auth-library');
 
 const postCategory = async(req, res = response) =>{
     
@@ -80,18 +79,13 @@ const putCategory = async(req, res = response) =>{
 const deleteCategoty = async(req, res = response) =>{
     const { id } = req.params;
     const authUser = req.authorizedUser;
-
-    if(authUser.role != 'ADMIN_ROLE'){
-        return res.status(401).json({
-            msg: 'this user has not enough privileges'
-        });
-    }
     
     const category = await Category.findByIdAndUpdate(id, {status: false});
     return res.json({
-        msg: `categoria ${category.name} eliminada correctamente`
+        msg: `category${category.name} succsessfully deleted`
     });
 }
+
 module.exports = {
     getCategories,
     postCategory,

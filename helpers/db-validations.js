@@ -1,5 +1,5 @@
 const { default: mongoose } = require('mongoose');
-const { Category, User } = require('../models');
+const { Category, User, Product } = require('../models');
 const Role = require('../models/rol');
 
 const validRole = async(role = '') =>{
@@ -42,10 +42,19 @@ const deletedCategory = async( id ) =>{
         // Verificar si el id de la categoría existe
         const deletedCategory = await Category.findById(id);
         if(deletedCategory && deletedCategory.status == false){
-            console.log('entro')
             throw new Error('the selected category doesnt exist');
         }
 
+    }
+}
+
+const existingProduct = async( id ) =>{
+    if(mongoose.Types.ObjectId.isValid(id)){
+        // Verificar si el id de la categoría existe
+        const existProduct = await Product.findById(id)
+        if(!existProduct) {
+            throw new Error('the selected product doesnt exist');
+        }
     }
 }
 
@@ -54,5 +63,6 @@ module.exports = {
     existingEmail,
     existingUser,
     existingCategory,
-    deletedCategory
+    deletedCategory,
+    existingProduct
 }
